@@ -15,7 +15,7 @@ engine = create_engine(f'sqlite:///{db_path}')
 
 
 @st.cache_data
-def carregar_dados():
+def load_data():
 
     query = """
     SELECT 
@@ -30,9 +30,8 @@ def carregar_dados():
     return pd.read_sql(query, engine)
 
 
-# 4. Executando a leitura
 try:
-    df = carregar_dados()
+    df = load_data()
     st.success("Banco de dados conectado e cruzamento realizado com sucesso!")
 
     # Imprime a tabela crua na tela para validação
