@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        background-color: #020617;
+        color: #f8fafc;
+        display: flex;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        -webkit-font-smoothing: antialiased; /* Deixa o texto mais nítido */
+        flex-direction: column;
+        align-items: center;
+        padding: 4rem 2rem;
+      }
+      .content-wrapper {
+        max-width: 900px;
+      }
+
+      .artistic-title-container {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+      .georisk-logo {
+        font-size: 5rem;
+        font-weight: 900;
+        background: linear-gradient(90deg, #2dd4bf 0%, #3b82f6 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: block;
+      }
+      .georisk-subtitle {
+        font-size: 1.4rem;
+        font-family: "Cinzel", serif;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+      }
+
+      .intro-card-container {
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        text-align: justify;
+      }
+      .intro-card-container h2 {
+        color: #1babcc;
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      .intro-card-container p {
+        color: #e2e8f0;
+        line-height: 1.8; /* Aumenta o respiro entre linhas */
+        margin-bottom: 1.5rem; /* Aumenta o respiro entre parágrafos */
+        font-size: 1.05rem; /* Um pouco maior para facilitar a leitura */
+        letter-spacing: 0.01em; /* Leve espaçamento entre letras */
+      }
+      .btn-dashboard {
+        display: block;
+        width: 100%;
+        max-width: 400px;
+        margin: 3rem auto;
+        padding: 18px;
+        border-radius: 8px;
+        border: 1px solid #020024;
+        background: linear-gradient(
+          90deg,
+          #020024 0%,
+          #090979 100%,
+          #1babcc 100%
+        );
+        color: #ffffff;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+      .btn-dashboard:hover {
+        border-color: #2dd4bf;
+        box-shadow: 0 0 18px rgba(45, 212, 191, 0.6);
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content-wrapper">
+      <div class="artistic-title-container">
+        <span class="georisk-logo">GeoRisk</span>
+        <span class="georisk-subtitle"
+          >Análise de Riscos no Rio de Janeiro</span
+        >
+      </div>
+      <div class="intro-card-container">
+        <h2>Sobre</h2>
+        <p>
+          O GeoRisk é uma plataforma voltada à análise de riscos geológicos e
+          impactos socioambientais no estado do Rio de Janeiro. Por meio da
+          integração de dados históricos de deslizamentos, precipitação e
+          indicadores de capacidade adaptativa municipal, a plataforma oferece
+          suporte à compreensão de padrões de vulnerabilidade e risco entre os
+          anos de 2014 e 2024.
+        </p>
+      </div>
+      <div class="intro-card-container">
+        <h2>Desenvolvimento e Funcionalidades</h2>
+        <p>
+          O projeto foi desenvolvido a partir da análise da base
+          <strong>simulacao_chuvas_deslizamentos.csv</strong>, contendo
+          informações sobre precipitação, ocorrências de deslizamentos, nível de
+          risco, óbitos e desalojados em municípios do estado do Rio de Janeiro.
+        </p>
+        <p>
+          Para enriquecer as análises, foi realizada a integração dessa base com
+          indicadores de capacidade adaptativa e investimento per capita obtidos
+          na plataforma
+          <strong
+            ><a
+              href="https://data.inpe.br/geonetwork/srv/api/records/adaptabrasil60005"
+              target="_blank"
+              style="color: #2dd4bf"
+            >
+              AdaptaBrasil</a
+            ></strong
+          >, considerando os dados referentes ao ano de 2015. O cruzamento foi
+          realizado por meio da identificação dos municípios em comum entre as
+          duas bases, permitindo investigar possíveis relações entre
+          investimentos em adaptação climática, capacidade de resposta municipal
+          e impactos causados pelos deslizamentos.
+        </p>
+        <p>
+          Os dados foram modelados e armazenados em um banco de dados SQLite
+          utilizando SQLAlchemy, possibilitando consultas relacionais e
+          integração entre as tabelas. A partir dessa estrutura foram
+          desenvolvidos indicadores dinâmicos, visualizações analíticas e
+          dashboards interativos utilizando Streamlit.
+        </p>
+        <p>
+          Além das análises exploratórias, foi implementado um modelo de árvore
+          de decisão para investigar como variáveis como precipitação, nível de
+          risco e índice do solo influenciam a classificação dos eventos
+          analisados.
+        </p>
+        <ul style="color: #e2e8f0; line-height: 1.6">
+          <li>✅ Integração e cruzamento de bases de dados distintas</li>
+          <li>✅ Modelagem relacional com SQLAlchemy e SQLite</li>
+          <li>✅ KPIs dinâmicos e indicadores de impacto</li>
+          <li>✅ Dashboards organizados em múltiplas seções</li>
+          <li>✅ Aplicação web interativa com Streamlit</li>
+          <li>✅ Análise exploratória e visualização de dados</li>
+          <li>✅ Aplicação de modelo de árvore de decisão</li>
+        </ul>
+      </div>
+      <div class="intro-card-container">
+        <h2>Tecnologias Utilizadas</h2>
+        <p>
+          O ecossistema deste projeto foi dividindo claramente as
+          responsabilidades de Front-end, Back-end e Processamento de Dados:
+        </p>
+        <ul style="color: #e2e8f0; line-height: 1.8">
+          <li>
+            <strong>Streamlit:</strong> Framework de Front-end para renderização
+            de aplicações Web dinâmicas (SPA).
+          </li>
+          <li>
+            <strong>Python & Pandas:</strong> Motor principal de processamento
+            lógico e agregação matemática de dados em tempo de execução.
+          </li>
+          <li>
+            <strong>SQLite & SQLAlchemy:</strong> Banco de dados relacional e
+            ORM para abstração e segurança nas integrações lógicas.
+          </li>
+          <li>
+            <strong>HTML5 & CSS3:</strong> Customização padrão somente para
+            facilitar visualização do projeto, os dados apresentados.
+          </li>
+          <li>
+            <strong>Plotly Express:</strong> Biblioteca de DataViz para
+            renderização de gráficos e mapeamento geográfico interativo.
+          </li>
+        </ul>
+      </div>
+      <a href="URL" class="btn-dashboard">📊 ACESSAR DASHBOARD</a>
+    </div>
+  </body>
+</html>
