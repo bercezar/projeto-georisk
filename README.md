@@ -36,6 +36,7 @@ Abaixo estão as tecnologias fundamentais utilizadas no desenvolvimento do siste
 ---
 
 ### 🏗️ Arquitetura do Sistema
+```mermaid
 graph TD
     A[Base de Dados AdaptaBrasil / INPE] --> B[(SQLite DB)]
     B --> C[SQLAlchemy / ORM]
@@ -48,7 +49,7 @@ graph TD
     style B fill:#1e293b,stroke:#00d4ff
     style F fill:#0f172a,stroke:#00d4ff,stroke-width:2px
     style E fill:#0f172a,stroke:#00d4ff
-
+```
 O pipeline de dados assegura a integridade desde o armazenamento bruto até à inferência do modelo. A lógica foi encapsulada para garantir performance e escalabilidade, seguindo boas práticas de desenvolvimento Python.
 
 ---
@@ -63,4 +64,3 @@ O pipeline de dados assegura a integridade desde o armazenamento bruto até à i
 * **Impacto da Precipitação na Frequência de Ocorrências:**
   ![Impacto da Precipitação](images/ocorrencia_por_preciptacao.png)
 
---
