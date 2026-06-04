@@ -8,7 +8,7 @@ Este projeto foi desenvolvido para a disciplina de **Linguagens de Programação
 
 A aplicação está hospedada e disponível para acesso público. Escolha a sua porta de entrada:
 
-* 🌐 **[Landing Page Oficial](https://bercezar.github.io/projeto-georisk/)**: Visão executiva do projeto e documentação resumida.
+🌐 **[GeoRisk](https://bercezar.github.io/projeto-georisk/)**: Visão executiva do projeto e documentação resumida.
 
 ---
 
