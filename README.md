@@ -31,15 +31,15 @@ Pela análise dos dados no **AdaptaBrasil (INPE)**, há informativos sobre:
 
 ### ✨ Funcionalidades Principais
 
-- [x] Integração e cruzamento de bases de dados distintas
-- [x] Modelagem relacional com SQLAlchemy e SQLite
-- [x] KPIs dinâmicos e indicadores de impacto
-- [x] Dashboards organizados em múltiplas seções
-- [x] Aplicação web interativa com Streamlit
-- [x] Análise exploratória e visualização de dados
-- [x] Aplicação de modelo de árvore de decisão
-- [x] Modelo preditivo de Machine Learning para classificação de risco
-- [x] Simulador interativo de cenários baseado em Árvore de Decisão
+- ✅ Integração e cruzamento de bases de dados distintas
+- ✅ Modelagem relacional com SQLAlchemy e SQLite
+- ✅ KPIs dinâmicos e indicadores de impacto
+- ✅ Dashboards organizados em múltiplas seções
+- ✅ Aplicação web interativa com Streamlit
+- ✅ Análise exploratória e visualização de dados
+- ✅ Aplicação de modelo de árvore de decisão
+- ✅ Modelo preditivo de Machine Learning para classificação de risco
+- ✅ Simulador interativo de cenários baseado em Árvore de Decisão
 
 ---
 
