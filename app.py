@@ -173,26 +173,8 @@ modelo_ia, lista_cidades_ia, mapa_regioes_ia, dic_cidade_regiao_ia = train_model
 
 # --- CABEÇALHO E FILTROS ---
 st.title("📊 GeoRisk: Painel Analítico")
-st.markdown("""
-    <a href="https://bercezar.github.io/projeto-georisk/" target="_top" 
-       style="
-        display: inline-block;
-        padding: 8px 16px;
-        margin-bottom: 20px;
-        background-color: transparent;
-        color: #94a3b8;
-        border: 1px solid #1e293b;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-       "
-       onmouseover="this.style.color='#00d4ff'; this.style.borderColor='#00d4ff';"
-       onmouseout="this.style.color='#94a3b8'; this.style.borderColor='#1e293b';">
-       ← Voltar para a Home
-    </a>
-""", unsafe_allow_html=True)
+st.link_button("⬅️ Voltar para a Home",
+               "https://bercezar.github.io/projeto-georisk/")
 st.markdown("---")
 
 
