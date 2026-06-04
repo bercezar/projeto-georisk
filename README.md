@@ -4,6 +4,14 @@ Este projeto foi desenvolvido para a disciplina de **Linguagens de Programação
 
 ---
 
+### 🚀 Acesso ao Projeto (Deploy)
+
+A aplicação está hospedada e disponível para acesso público. Escolha a sua porta de entrada:
+
+🌐 **[GeoRisk](https://bercezar.github.io/projeto-georisk/)**: Visão executiva do projeto e documentação resumida.
+
+---
+
 ### 🎯 Sobre o Projeto
 O **GeoRisk** foi desenvolvido no âmbito do **Tema 2 — Chuvas e Deslizamentos no Estado do Rio de Janeiro**. A base de dados principal é composta pelo ficheiro `simulacao_chuvas_deslizamentos_rj.csv`, fornecido pelo orientador para o desenvolvimento do sistema. 
 
