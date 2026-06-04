@@ -1,16 +1,24 @@
 # 📊 GeoRisk: Painel Analítico de Riscos Geológicos
 
-Este projeto foi desenvolvido para a disciplina de **Linguagens de Programação**, sob a orientação do professor **Alexandre Neves Louzada**. O GeoRisk é uma solução focada em **Análise de Dados, Estatística Computacional e Desenvolvimento em Python**, dedicada à modelagem e mitigação de riscos de deslizamentos no estado do Rio de Janeiro.
+Este projeto foi desenvolvido para a disciplina de **Linguagens de Programação**, sob a orientação do professor **Alexandre Neves Louzada**. O GeoRisk é uma solução focada em **Análise de Dados, Estatística Computacional e Desenvolvimento em Python**, dedicada à modelagem de riscos de deslizamentos no estado do Rio de Janeiro.
 
 ---
 
 ### 🎯 Sobre o Projeto
-O GeoRisk cruza dados históricos de ocorrências com indicadores de capacidade adaptativa para gerar insights preditivos. A base de dados utilizada provém da [AdaptaBrasil (INPE)](https://data.inpe.br/geonetwork/srv/api/records/adaptabrasil60005), garantindo rigor técnico e científico à análise.
+O **GeoRisk** foi desenvolvido no âmbito do **Tema 2 — Chuvas e Deslizamentos no Estado do Rio de Janeiro**. A base de dados principal é composta pelo ficheiro `simulacao_chuvas_deslizamentos_rj.csv`, fornecido pelo orientador para o desenvolvimento do sistema. 
 
----
+Com o objetivo de elevar a robustez técnica e o potencial preditivo da aplicação, tomei a iniciativa de pesquisar e integrar uma fonte externa complementar: a base de dados da **AdaptaBrasil (INPE)**, focada no indicador de *Desastres geo-hidrológicos — Deslizamento de terra — Capacidade adaptativa* ([acesso aos dados aqui](https://data.inpe.br/geonetwork/srv/api/records/adaptabrasil60005)). 
+
+O cruzamento desses dois conjuntos de dados permitiu que a ferramenta não apenas analise o fenómeno meteorológico de forma isolada, mas também contextualize as ocorrências dentro da resiliência e infraestrutura dos municípios, resultando num modelo preditivo cientificamente mais embasado e preciso.
+
+--- 
+
+### ℹ️ Informativos
+Pela análise dos dados no **AdaptaBrasil (INPE)**, há informativos sobre:
+- **Índice de capacidade adaptativa**: Capacidade do sistema socioecológico de se preparar e se ajustar aos desastres geo-hidrológicos provenientes das alterações climáticas ou danos climáticos potenciais, principalmente para diminuir os impactos negativos, aproveitar as oportunidades ou responder às consequências. No contexto das mudanças climáticas, a adaptação é compreendida como um conjunto de processos de ajustes no sistema, com a finalidade principal de preparar o mesmo para os efeitos das mudanças climáticas e, assim, reduzir as condições de vulnerabilidade a riscos de eventos adversos. O Índice de Capacidade Adaptativa é resultante da composição dos indicadores temáticos: Capacidade de investimento público municipal e renda; Governança e gestão de risco de desastres de deslizamento de terra; e Capacidade municipal em cidadania e políticas setoriais.
+- **Investimento per capita em políticas de adaptação e infraestrutura para proteção ambiental**: Valor per capita das transferências governamentais destinadas à proteção ambiental em políticas de adaptação e infraestrutura, considerando a temática de capacidade municipal em investimento e renda. Para composição deste indicador foram considerados todos os tipos de transferências (legais, voluntárias e específicas, além das transferências constitucionais e royalties) realizadas para a administração pública municipal e para o fundo público (denominados como favorecidos), nas áreas de atuação (função): agricultura, educação, gestão ambiental, habitação, organização agrária, reserva de contingência, saneamento, saúde e urbanismo. O indicador foi obtido a partir da razão entre o total dos recursos financeiros repassados aos favorecidos nas funções especificadas acima e a população total. Dados em nível municipal obtidos em Detalhamento das transferências de recursos disponibilizados pelo Portal da Transparência da Controladoria-Geral da União (CGU)
 
 ### 🛠️ Stack Tecnológica
-Abaixo estão as tecnologias fundamentais utilizadas no desenvolvimento do sistema:
 
 - **Streamlit:** Framework de Front-end para renderização de aplicações Web dinâmicas (SPA).
 - **Python & Pandas:** Motor principal de processamento lógico e agregação matemática de dados em tempo de execução.
@@ -38,19 +46,19 @@ Abaixo estão as tecnologias fundamentais utilizadas no desenvolvimento do siste
 ### 🏗️ Arquitetura do Sistema
 ```mermaid
 graph TD
-    A[Base de Dados AdaptaBrasil / INPE] --> B[(SQLite DB)]
-    B --> C[SQLAlchemy / ORM]
-    C --> D[Pandas / Processamento]
-    D --> E[Scikit-Learn: Árvore de Decisão]
-    D --> F[Streamlit Dashboard]
-    E -->|Previsão de Risco| F
-    F --> G(Usuário Final)
+    CSV1[CSV: AdaptaBrasil / INPE] --> DB[(SQLite DB)]
+    CSV2[CSV: Simulação Deslizamentos] --> DB
+    DB --> SQL[SQLAlchemy / ORM]
+    SQL --> PANDAS[Pandas: Consolidação & Tratamento]
+    PANDAS --> MODEL[Scikit-Learn: Árvore de Decisão]
+    PANDAS --> DASH[Streamlit Dashboard]
+    MODEL -->|Predição| DASH
+    DASH --> USER(Usuário Final)
 
-    style B fill:#1e293b,stroke:#00d4ff
-    style F fill:#0f172a,stroke:#00d4ff,stroke-width:2px
-    style E fill:#0f172a,stroke:#00d4ff
+    style DB fill:#1e293b,stroke:#00d4ff
+    style PANDAS fill:#0f172a,stroke:#00d4ff
+    style MODEL fill:#0f172a,stroke:#00d4ff
 ```
-O pipeline de dados assegura a integridade desde o armazenamento bruto até à inferência do modelo. A lógica foi encapsulada para garantir performance e escalabilidade, seguindo boas práticas de desenvolvimento Python.
 
 ---
 
