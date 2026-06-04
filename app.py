@@ -174,7 +174,7 @@ modelo_ia, lista_cidades_ia, mapa_regioes_ia, dic_cidade_regiao_ia = train_model
 # --- CABEÇALHO E FILTROS ---
 st.title("📊 GeoRisk: Painel Analítico")
 st.markdown("""
-    <a href="https://bercezar.github.io/projeto-georisk/" target="_self" 
+    <a href="https://bercezar.github.io/projeto-georisk/" target="_top" 
        style="
         display: inline-block;
         padding: 8px 16px;
