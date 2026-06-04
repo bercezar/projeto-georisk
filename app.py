@@ -3,291 +3,423 @@ import pandas as pd
 import plotly.express as px
 from sqlalchemy import create_engine
 import os
-
-# --- CONSTANTES DE ESTILO ---
-COLOR_SEQUENCE = ["#0f766e", "#2563eb",
-                  "#dc2626", "#7c3aed", "#ca8a04", "#475569"]
-DARK_COLOR_SEQUENCE = ["#2dd4bf", "#60a5fa",
-                       "#fb7185", "#c084fc", "#facc15", "#94a3b8"]
+from sklearn.tree import DecisionTreeClassifier
 
 # --- 1. CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="GeoRisk Dashboard",
-                   layout="wide", page_icon="🌧️")
-
-# --- CSS PERSONALIZADO (ESTÉTICA E GRADIENTE) ---
+                   layout="wide", page_icon="📊")
 
 
-def apply_custom_css():
-    st.markdown("""
-        <style>
-        .stApp { background: #020617; color: #f8fafc; }
-        
-        /* Justificação do texto e centralização básica */
-        div[data-testid="stMarkdownContainer"] p { text-align: justify; }
-        h1, h2, h3 { text-align: center; }
-        .block-container { max-width: 70%; margin: auto; padding-top: 10rem; }
-        
-        /* Estilo das Métricas dentro do Gradiente */
-        .kpi-row {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .kpi-box {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(45, 212, 191, 0.3);
-            border-top: 3px solid #2dd4bf;
-            padding: 1.5rem;
-            border-radius: 8px;
-            min-width: 180px;
-        }
-        
-        .kpi-box span {
-            display: block;
-            color: #99f6e4;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-        
-        .kpi-box strong {
-            color: #f8fafc;
-            font-size: 2.2rem;
-            line-height: 1;
-        }
+st.markdown("""
+    <style>
+    .stApp { background: #020617; color: #f8fafc; }
+    .metric-card-container {
+        background: #171717; border: 1px solid #262626; padding: 2rem;
+        border-radius: 12px; text-align: center; margin-bottom: 2rem;
+    }
 
-        /* Restante do teu CSS original */
-        .metric-card-container { 
-                background: #111827; border: 1px solid #334155; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center; 
-        }
-        .stButton > button { 
-            width: 100%; 
-            min-height: 58px; 
-            padding: 0 28px; 
-            border-radius: 8px; 
-            border: 1px solid #020024; 
-            background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 100%, rgba(27, 171, 204, 1) 100%) !important; 
-            color: #ffffff !important; 
-            font-size: 1.08rem; 
-            font-weight: 700;
-            transition: all 0.3s ease; 
-        }
-        .stButton > button:hover {
-            border-color: #2dd4bf !important; 
-            box-shadow: 0 0 18px rgba(45, 212, 191, 0.6) !important;
-            transform: translateY(-2px);
-            
-        }
+    .kpi-row-dash {
+        display: flex;
+        justify-content: space-between;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: #020617;
+        background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+        border: 1px solid #1e293b;
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
 
-        .intro-card-container { 
-                background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 2.5rem; margin-top: 1rem; margin-bottom: 2rem;
-        }
-        .intro-card-container h3 { 
-                color: #1BABCC !important; margin-top: 0; margin-bottom: 1.5rem; font-size: 1.8rem; 
-        }
-        .intro-card-container p { 
-                color: #e2e8f0; line-height: 1.6; margin-bottom: 1rem; 
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    .kpi-box-dash {
+        flex: 1;
+        background: rgba(15, 23, 42, 0.6);
 
+        border: 1px solid #0284c7;
+        border-top: 3px solid #00d4ff;
 
-# --- 2. CONTROLO DE NAVEGAÇÃO ---
-if 'pagina_atual' not in st.session_state:
-    st.session_state.pagina_atual = 'apresentacao'
+        padding: 1.5rem;
+        border-radius: 8px;
+        min-width: 200px;
+        text-align: center;
 
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
+    }
 
-def mudar_pagina(nova_pagina):
-    st.session_state.pagina_atual = nova_pagina
+    .stTabs [data-baseweb="tab-list"] {
+        display: flex !important;
+        justify-content: center !important;
+        gap: 0 !important;
+        border-bottom: none !important;
+    }
 
-# --- 3. CARREGAMENTO DE DADOS ---
+    .stTabs [data-baseweb="tab-list"] button {
+        flex-grow: 1 !important;
+        max-width: 300px !important;
+        background-color: transparent !important;
+        border-radius: 0 !important;
+        transition: all 0.3s ease !important;
+        padding: 10px 20px !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] button:hover {
+        background-color: transparent !important;
+        border-bottom: 2px solid #00d4ff !important;
+        box-shadow: none !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        background-color: transparent !important;
+        border-bottom: 3px solid #00d4ff !important;
+        box-shadow: none !important;
+    }
+    .stTabs [data-baseweb="tab-highlight"] {
+        display: none !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px !important;
+        border-bottom: none !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] button:hover p,
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] p {
+        color: #00d4ff !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.4) !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] button p {
+        color: #94a3b8 !important;
+        transition: color 0.3s ease !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] button:focus,
+    .stTabs [data-baseweb="tab-list"] button:focus-visible {
+        outline: none !important;
+        background-color: transparent !important;
+    }
+
+    .kpi-box-dash span {
+        display: block;
+        color: ##94a3b8;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .kpi-box-dash strong {
+        color: #00d4ff;
+        font-size: 2.2rem;
+        line-height: 1;
+        font-weight: 700;
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- FUNÇÕES DE DADOS E ML ---
 
 
 @st.cache_data
 def load_data():
-    caminho_banco = os.path.abspath(os.path.join("database", "georisk.db"))
-    engine = create_engine(f"sqlite:///{caminho_banco}")
-    df_historico = pd.read_sql("SELECT * FROM ocorrencias", engine)
+    database_path = os.path.abspath(os.path.join("database", "georisk.db"))
+    engine = create_engine(f"sqlite:///{database_path}")
 
-    query_2015 = """
-        SELECT o.municipio, o.ocorrencias_deslizamento, o.obitos, o.desalojados,
-               c.valor_adaptativo, c.classe_adaptativa, c.valor_per_capita, c.classe_per_capita
-        FROM ocorrencias o JOIN capacidade_adaptativa c ON o.municipio = c.municipio
-        WHERE o.ano = 2015
+    query = """
+        SELECT o.*, c.valor_adaptativo, c.classe_adaptativa, c.valor_per_capita
+        FROM ocorrencias o
+        LEFT JOIN capacidade_adaptativa c ON o.municipio = c.municipio
     """
-    df_2015 = pd.read_sql(query_2015, engine)
-    return df_historico, df_2015
+    df = pd.read_sql(query, engine)
+    return df
 
 
-df_historico, df_2015 = load_data()
+@st.cache_resource
+def train_model(df):
+    features = ['chuva_mm', 'indice_solo', 'municipio']
+    target = 'nivel_risco'
 
-# --- 4. PÁGINA 1: APRESENTAÇÃO ---
-if st.session_state.pagina_atual == 'apresentacao':
-    apply_custom_css()
-st.markdown("""
-            <style>
-            .artistic-title-container {
-                text-align: center;
-                margin-bottom: 3rem;
-                margin-top: 1rem;
-            }
-            .georisk-logo {
-                font-size: 5rem;
-                font-weight: 900;
-                /* O truque mágico: Gradiente aplicado diretamente na fonte */
-                background: linear-gradient(90deg, #2dd4bf 0%, #3b82f6 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                letter-spacing: -2px;
-                display: block;
-                line-height: 1.1;
-            }
-            .georisk-subtitle {
-                font-size: 1.4rem;
-                color: #94a3b8;
-                font-weight: 400;
-                letter-spacing: 3px;
-                text-transform: uppercase;
-                margin-top: 0.5rem;
-                display: block;
-            }
-            </style>
-            
-            <div class="artistic-title-container">
-                <span class="georisk-logo">GeoRisk</span>
-                <span class="georisk-subtitle">Análise de Riscos no Rio de Janeiro</span>
-            </div>
-        """, unsafe_allow_html=True)
-# st.sidebar.header("Filtros Gerais")
-# mun = st.sidebar.selectbox("Selecione o Município (Visão Geral):",
-#                            ["Todos"] + sorted(df_historico['municipio'].unique().tolist()))
+    df_model = df[features + [target]].dropna()
 
-# df_f = df_historico if mun == "Todos" else df_historico[df_historico['municipio'] == mun]
+    X = df_model[features].copy()
+    y = df_model[target]
 
-# col_esq, col_centro, col_dir = st.columns([1.5, 4, 1.5])
+    # Encoding dinâmico de municípios
+    cidades = sorted(X['municipio'].unique())
+    mapa_cidades = {cidade: idx for idx, cidade in enumerate(cidades)}
 
-# with col_centro:
-#     # TUDO AQUI DENTRO VAI FICAR COM O FUNDO AZUL GRADIENTE
-#     with st.container():
-#         # A âncora que chama o CSS
-#         st.markdown('<span id="meu-fundo-gradiente"></span>',
-#                     unsafe_allow_html=True)
+    X['municipio'] = X['municipio'].map(mapa_cidades)
 
-#         st.markdown("<h1>GeoRisk: Análise de Riscos no RJ</h1>",
-#                     unsafe_allow_html=True)
+    model = DecisionTreeClassifier(max_depth=3, min_samples_split=20)
+    model.fit(X, y)
 
-#         # O SELETOR ESTÁ AQUI, NATIVO E FUNCIONANDO!
-#         _, col_filtro, _ = st.columns([1, 2, 1])
-#         with col_filtro:
-#             mun = st.selectbox("Selecione o Município (Visão Geral):", [
-#                                "Todos"] + sorted(df_historico['municipio'].unique().tolist()))
+    return model, cidades
 
-#         # O Python filtra os dados
-#         df_f = df_historico if mun == "Todos" else df_historico[df_historico['municipio'] == mun]
 
-#         val_ocorrencias = f"{df_f['ocorrencias_deslizamento'].sum():,.0f}".replace(
-#             ",", ".")
-#         val_obitos = f"{df_f['obitos'].sum():,.0f}".replace(",", ".")
-#         val_desalojados = f"{df_f['desalojados'].sum():,.0f}".replace(
-#             ",", ".")
+# Inicialização do Dataset e Modelo
+df_completo = load_data()
+modelo_ia, lista_cidades_ia = train_model(df_completo)
 
-#         # AS CAIXAS DE KPI, USANDO A SUA ESTRUTURA HTML ORIGINAL
-#         st.markdown(f"""
-#         <div class="kpi-row">
-#             <div class="kpi-box">
-#                 <span>Ocorrências</span>
-#                 <strong>{val_ocorrencias}</strong>
-#             </div>
-#             <div class="kpi-box">
-#                 <span>Óbitos</span>
-#                 <strong>{val_obitos}</strong>
-#             </div>
-#             <div class="kpi-box">
-#                 <span>Desalojados</span>
-#                 <strong>{val_desalojados}</strong>
-#             </div>
-#         </div>
-#         """, unsafe_allow_html=True)
-st.markdown(
-    """
-<div class="intro-card-container">
-<h3>Sobre</h3>
-<p>O GeoRisk é uma plataforma voltada à análise de riscos geológicos e impactos socioambientais no estado do Rio de Janeiro. Por meio da integração de dados históricos de deslizamentos, precipitação e indicadores de capacidade adaptativa municipal, a plataforma oferece suporte à compreensão de padrões de vulnerabilidade e risco entre os anos de 2014 e 2024.</p>
-</div>
 
-<div class="intro-card-container">
-<h3>Desenvolviemento e Funcionalidades</h3>
-<p>O projeto foi desenvolvido a partir da análise da base <strong>simulacao_chuvas_deslizamentos.csv</strong>, fornecida no Projeto G2 - Tema 2, contendo informações sobre precipitação, ocorrências de deslizamentos, nível de risco, óbitos e desalojados em municípios do estado do Rio de Janeiro.</p>
-<p>Para enriquecer as análises, foi realizada a integração dessa base com indicadores de capacidade adaptativa e investimento per capita obtidos na plataforma <strong><a href="https://data.inpe.br/geonetwork/srv/api/records/adaptabrasil60005" target="_blank" style="color: #2dd4bf;">
-AdaptaBrasil</a></strong>, considerando os dados referentes ao ano de 2015. O cruzamento foi realizado por meio da identificação dos municípios em comum entre as duas bases, permitindo investigar possíveis relações entre investimentos em adaptação climática, capacidade de resposta municipal e impactos causados pelos deslizamentos.</p>
-<p>Os dados foram modelados e armazenados em um banco de dados SQLite utilizando SQLAlchemy, possibilitando consultas relacionais e integração entre as tabelas. A partir dessa estrutura foram desenvolvidos indicadores dinâmicos, visualizações analíticas e dashboards interativos utilizando Streamlit.</p>
-<p>Além das análises exploratórias, foi implementado um modelo de árvore de decisão para investigar como variáveis como precipitação, nível de risco e índice do solo influenciam a classificação dos eventos analisados.</p>
-<ul style="color: #e2e8f0; line-height: 1.6;">
-<li>✅ Integração e cruzamento de bases de dados distintas</li>
-<li>✅ Modelagem relacional com SQLAlchemy e SQLite</li>
-<li>✅ KPIs dinâmicos e indicadores de impacto</li>
-<li>✅ Dashboards organizados em múltiplas seções</li>
-<li>✅ Aplicação web interativa com Streamlit</li>
-<li>✅ Análise exploratória e visualização de dados</li>
-<li>✅ Aplicação de modelo de árvore de decisão</li>
-</ul>
-</div>
+# --- CABEÇALHO E FILTROS ---
+st.title("📊 GeoRisk: Painel Analítico")
+st.markdown("---")
 
-<div class="intro-card-container">
-<h3>Tecnologias Utilizadas</h3>
-<p>O ecossistema deste projeto foi dividindo claramente as responsabilidades de Front-end, Back-end e Processamento de Dados:</p>
-<ul style="color: #e2e8f0; line-height: 1.8;">
-<li><strong>Streamlit:</strong> Framework de Front-end para renderização de aplicações Web dinâmicas (SPA).</li>
-<li><strong>Python & Pandas:</strong> Motor principal de processamento lógico e agregação matemática de dados em tempo de execução.</li>
-<li><strong>SQLite & SQLAlchemy:</strong> Banco de dados relacional e ORM para abstração e segurança nas integrações lógicas.</li>
-<li><strong>HTML5 & CSS3:</strong> Customização avançada de UI/UX, utilizando Flexbox para estruturação responsiva dos componentes.</li>
-<li><strong>Plotly Express:</strong> Biblioteca de DataViz para renderização de gráficos e mapeamento geográfico interativo.</li>
-</ul>
-</div>
-""",
-    unsafe_allow_html=True
-)
-if st.button("📊 ACESSAR DASHBOARD DE DADOS", use_container_width=True, type="primary"):
-    mudar_pagina('dashboard')
 
-# --- 5. PÁGINA 2: O DASHBOARD ---
-elif st.session_state.pagina_atual == 'dashboard':
-    apply_custom_css()
+_, col_filtros, _ = st.columns([1, 2, 1])
+with col_filtros:
+    st.markdown("<h4 style='text-align: center; color: #94a3b8; margin-bottom: 1rem;'></h4>",
+                unsafe_allow_html=True)
 
-    col_titulo, col_botao = st.columns([4, 1])
-    with col_titulo:
-        st.title("📊 GeoRisk: Painel Analítico")
-    with col_botao:
-        if st.button("⬅️ Voltar"):
-            st.session_state.show_dashboard = False
-            st.rerun()
+    mun = st.selectbox(
+        "Município:",
+        ["Todos"] + sorted(df_completo['municipio'].unique().tolist())
+    )
 
-    st.markdown("---")
+    ano_selecionado = st.slider(
+        "Selecione o Ano:",
+        int(df_completo['ano'].min()),
+        int(df_completo['ano'].max()),
+        (2014, 2024)
+    )
 
-    st.sidebar.header("Filtros")
-    mun = st.sidebar.selectbox(
-        "Município:", ["Todos"] + sorted(df_historico['municipio'].unique().tolist()))
-    df_f = df_historico if mun == "Todos" else df_historico[df_historico['municipio'] == mun]
+# Filtros globais
+filtered_df = df_completo.copy()
+if mun != "Todos":
+    filtered_df = filtered_df[filtered_df['municipio'] == mun]
 
-    st.markdown("### Indicadores de Impacto")
-    with st.container():
-        st.markdown('<div class="metric-card-container">',
-                    unsafe_allow_html=True)
-        k1, k2, k3, k4 = st.columns(4)
-        k1.metric("Ocorrências",
-                  f"{df_f['ocorrencias_deslizamento'].sum():,.0f}")
-        k2.metric("Óbitos", f"{df_f['obitos'].sum():,.0f}")
-        k3.metric("Desalojados", f"{df_f['desalojados'].sum():,.0f}")
-        k4.metric("Mun. Top", df_historico.groupby('municipio')
-                  ['ocorrencias_deslizamento'].sum().idxmax())
-        st.markdown('</div>', unsafe_allow_html=True)
+filtered_df = filtered_df[(filtered_df['ano'] >= ano_selecionado[0]) &
+                          (filtered_df['ano'] <= ano_selecionado[1])]
 
-    aba1, aba2 = st.tabs(
-        ["📈 Panorama Histórico", "🏙️ Capacidade vs Investimento (2015)"])
-    with aba1:
-        st.write("Gráficos de evolução aqui...")
-    with aba2:
-        st.write("Gráficos de 2015 aqui...")
+# --- KPIs GLOBAIS ---
+st.markdown("### Indicadores de Impacto")
+with st.container():
+
+    val_ocorrencias = f"{filtered_df['ocorrencias_deslizamento'].sum():,.0f}".replace(
+        ",", ".")
+    val_obitos = f"{filtered_df['obitos'].sum():,.0f}".replace(",", ".")
+    val_desalojados = f"{filtered_df['desalojados'].sum():,.0f}".replace(
+        ",", ".")
+
+    # Formatação para chuva acumulada
+    chuva_acumulada = filtered_df['chuva_mm'].sum()
+    txt_chuva = f"{chuva_acumulada:,.1f}"
+    val_chuva_max = txt_chuva.replace(",", "X").replace(
+        ".", ",").replace("X", ".") + " mm"
+
+    st.markdown(f"""
+    <div class="kpi-row-dash">
+        <div class="kpi-box-dash">
+            <span>Ocorrências</span>
+            <strong>{val_ocorrencias}</strong>
+        </div>
+        <div class="kpi-box-dash">
+            <span>Óbitos</span>
+            <strong>{val_obitos}</strong>
+        </div>
+        <div class="kpi-box-dash">
+            <span>Desalojados</span>
+            <strong>{val_desalojados}</strong>
+        </div>
+        <div class="kpi-box-dash">
+            <span>Chuva Máx Registrada</span>
+            <strong>{val_chuva_max}</strong>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# --- ABAS ---
+aba1, aba2, aba3, aba4, aba5 = st.tabs(
+    ["📈 Panorama Histórico", "🔬 Modo Exploração", "📊 Análises Comparativas", "🗺️ Mapa de Concentração", "🤖 GeoRisk Classificador de Risco"])
+
+
+# Séries Temporais
+with aba1:
+    st.subheader("Evolução Temporal de Ocorrências e Desalojados")
+
+    df_timeline = filtered_df.groupby(
+        'ano')[['ocorrencias_deslizamento', 'desalojados']].sum().reset_index()
+
+    fig_linha = px.line(df_timeline, x='ano', y='ocorrencias_deslizamento',
+                        title="Ocorrências ao longo dos anos", markers=True, template="plotly_dark")
+    st.plotly_chart(fig_linha, use_container_width=True)
+
+
+# Análise Exploratória
+with aba2:
+    st.subheader("Exploração Dinâmica de Variáveis")
+    st.write("Selecione as variáveis abaixo para descobrir correlações entre clima, impacto e capacidade adaptativa.")
+    display_labels = {
+        'chuva_mm': 'Precipitação (mm)',
+        'temperatura_media': 'Temperatura Média (°C)',
+        'ocorrencias_deslizamento': 'Ocorrências de Deslizamento',
+        'desalojados': 'Total de Desalojados',
+        'obitos': 'Total de Óbitos',
+        'indice_solo': 'Índice do Solo',
+        'umidade': 'Umidade Relativa',
+        'valor_adaptativo': 'Índice Adaptativa',
+        'municipio': 'Município',
+        'regiao_rj': 'Região RJ',
+        'nivel_risco': 'Nível de Risco',
+        'classe_adaptativa': 'Classe Adaptativa',
+        'valor_per_capita': 'Índice Per Capita',
+        'classe_per_capita': 'Classe de Investimento Per Capita'
+    }
+
+    col_x, col_y, col_color = st.columns(3)
+
+    numeric_features = ['chuva_mm', 'temperatura_media', 'ocorrencias_deslizamento',
+                        'desalojados', 'obitos', 'indice_solo', 'umidade', 'valor_adaptativo', 'valor_per_capita', 'classe_per_capita']
+    categorical_features = ['municipio', 'regiao_rj',
+                            'nivel_risco', 'classe_adaptativa']
+
+    with col_x:
+        axis_x = st.selectbox(
+            "Eixo X (Causa/Dimensão):",
+            numeric_features + categorical_features,
+            index=0,
+            format_func=lambda x: display_labels.get(x, x)
+        )
+    with col_y:
+        axis_y = st.selectbox(
+            "Eixo Y (Efeito/Métrica):",
+            numeric_features,
+            index=2,
+            format_func=lambda x: display_labels.get(x, x)
+        )
+    with col_color:
+        grouping_feature = st.selectbox(
+            "Colorir por (Agrupamento):",
+            categorical_features,
+            index=2,
+            format_func=lambda x: display_labels.get(x, x)
+        )
+
+    dynamic_title = f"Relação: {display_labels.get(axis_x, axis_x)} vs {display_labels.get(axis_y, axis_y)}"
+
+    dynamic_fig = px.scatter(
+        filtered_df,
+        x=axis_x,
+        y=axis_y,
+        color=grouping_feature,
+        hover_data=['municipio'],
+        template="plotly_dark",
+        opacity=0.7,
+        title=dynamic_title,
+        labels=display_labels
+    )
+
+    st.plotly_chart(dynamic_fig, use_container_width=True)
+
+# Rankings e Distribuição
+with aba3:
+    st.subheader("Rankings e Distribuição de Impacto")
+    st.write(
+        "Análise comparativa entre municípios e suas respectivas classes adaptativas.")
+
+    col_graf1, col_graf2 = st.columns(2)
+
+    with col_graf1:
+
+        df_top10 = filtered_df.groupby(
+            'municipio')['ocorrencias_deslizamento'].sum().nlargest(10).reset_index()
+
+        fig_barras = px.bar(
+            df_top10,
+            x='ocorrencias_deslizamento',
+            y='municipio',
+            orientation='h',
+            title="Top 10 Municípios (Mais Ocorrências)",
+            template="plotly_dark",
+            color='ocorrencias_deslizamento',
+            color_continuous_scale="Blues"
+        )
+
+        fig_barras.update_layout(yaxis={'categoryorder': 'total ascending'})
+        st.plotly_chart(fig_barras, use_container_width=True)
+
+    with col_graf2:
+        df_rosca = filtered_df.groupby('classe_adaptativa')[
+            'desalojados'].sum().reset_index()
+
+        fig_rosca = px.pie(
+            df_rosca,
+            values='desalojados',
+            names='classe_adaptativa',
+            hole=0.4,
+            title="Desalojados vs Capacidade Adaptativa",
+            template="plotly_dark",
+            color_discrete_sequence=px.colors.sequential.Blues_r
+        )
+        st.plotly_chart(fig_rosca, use_container_width=True)
+
+# Heatmap de Ocorrências
+with aba4:
+    st.subheader("Mapa de Calor (Heatmap) de Ocorrências Anuais")
+    st.write("Identifique os 'pontos quentes' ao longo do tempo. Cores mais claras indicam anos e municípios com maior intensidade de desastres.")
+
+    df_heatmap = filtered_df.pivot_table(
+        index='municipio',
+        columns='ano',
+        values='ocorrencias_deslizamento',
+        aggfunc='sum',
+        fill_value=0
+    )
+
+    if not df_heatmap.empty:
+        fig_heat = px.imshow(
+            df_heatmap,
+            labels=dict(x="Ano", y="Município", color="Ocorrências"),
+            x=df_heatmap.columns,
+            y=df_heatmap.index,
+            color_continuous_scale="Viridis",
+            aspect="auto",
+            title="Intensidade de Deslizamentos por Município e Ano"
+        )
+
+        fig_heat.update_xaxes(side="top")
+        fig_heat.update_layout(template="plotly_dark", margin=dict(l=150))
+
+        st.plotly_chart(fig_heat, use_container_width=True)
+    else:
+        st.info("Não há dados de ocorrências para os filtros selecionados.")
+
+# Predição ( Decision tree )
+with aba5:
+    st.subheader("Simulador Preditivo de Risco")
+    st.write(
+        "Ajuste as condições climáticas e geográficas para prever o nível de alerta.")
+
+    col_ia1, col_ia2, col_ia3 = st.columns(3)
+
+    with col_ia1:
+
+        cidade_sim = st.selectbox("Selecione o Município:", lista_cidades_ia)
+
+    with col_ia2:
+        chuva_sim = st.number_input(
+            "Previsão de Chuva (mm):", min_value=0.0, max_value=300.0, value=50.0)
+
+    with col_ia3:
+        solo_sim = st.number_input(
+            "Índice de Saturação do Solo (0.0 a 1.0):", min_value=0.0, max_value=1.0, value=0.5)
+
+    if st.button("🔮 Prever Nível de Risco"):
+
+        id_cidade = lista_cidades_ia.index(cidade_sim)
+
+        X_novo = [[chuva_sim, solo_sim, id_cidade]]
+
+        previsao = modelo_ia.predict(X_novo)[0]
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        if previsao in ["Baixo", "Médio"]:
+            st.success(f"✅ Nível de Risco Previsto: **{previsao}**")
+        elif previsao in ["Alto", "Crítico"]:
+            st.warning(f"⚠️ Nível de Risco Previsto: **{previsao}**")
+        else:
+            st.error(f"🚨 Nível de Risco Previsto: **{previsao}**")

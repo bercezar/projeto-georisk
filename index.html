@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <style>
       body {
-        background-color: #020617;
+        background-color: rgb(2, 6, 23);
         color: #f8fafc;
         display: flex;
         font-family:
@@ -72,12 +72,7 @@
         padding: 18px;
         border-radius: 8px;
         border: 1px solid #020024;
-        background: linear-gradient(
-          90deg,
-          #020024 0%,
-          #090979 100%,
-          #1babcc 100%
-        );
+        background: linear-gradient(135deg, #262626 0%, #171717 100%);
         color: #ffffff;
         font-weight: 700;
         text-align: center;
@@ -144,10 +139,17 @@
           dashboards interativos utilizando Streamlit.
         </p>
         <p>
-          Além das análises exploratórias, foi implementado um modelo de árvore
-          de decisão para investigar como variáveis como precipitação, nível de
-          risco e índice do solo influenciam a classificação dos eventos
-          analisados.
+          Além das análises exploratórias, foi desenvolvido o módulo GeoRisk
+          Preditor de Risco, baseado em Machine Learning. Para isso, foi
+          utilizado um modelo de Árvore de Decisão (Decision Tree Classifier)
+          treinado com dados históricos da base analisada. O modelo utiliza
+          variáveis como precipitação, índice de saturação do solo e município
+          para realizar a classificação do nível de risco de deslizamentos,
+          permitindo simular cenários e gerar previsões em tempo real dentro da
+          aplicação. A implementação desse modelo acrescenta uma camada
+          preditiva ao projeto, complementando as análises descritivas e
+          permitindo avaliar possíveis situações de risco a partir de diferentes
+          condições climáticas e geográficas.
         </p>
         <ul style="color: #e2e8f0; line-height: 1.6">
           <li>✅ Integração e cruzamento de bases de dados distintas</li>
@@ -157,6 +159,12 @@
           <li>✅ Aplicação web interativa com Streamlit</li>
           <li>✅ Análise exploratória e visualização de dados</li>
           <li>✅ Aplicação de modelo de árvore de decisão</li>
+          <li>
+            ✅ Modelo preditivo de Machine Learning para classificação de risco
+          </li>
+          <li>
+            ✅ Simulador interativo de cenários baseado em Árvore de Decisão
+          </li>
         </ul>
       </div>
       <div class="intro-card-container">
@@ -173,6 +181,11 @@
           <li>
             <strong>Python & Pandas:</strong> Motor principal de processamento
             lógico e agregação matemática de dados em tempo de execução.
+          </li>
+          <li>
+            <strong>Scikit-Learn:</strong> Biblioteca de Machine Learning
+            utilizada para treinamento e execução do modelo de Árvore de Decisão
+            responsável pela classificação preditiva dos níveis de risco.
           </li>
           <li>
             <strong>SQLite & SQLAlchemy:</strong> Banco de dados relacional e
