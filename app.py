@@ -134,11 +134,7 @@ def load_data():
         LEFT JOIN capacidade_adaptativa c ON o.municipio = c.municipio
     """
     df = pd.read_sql(query, engine)
-        df['municipio'] = (df['municipio']
-                       .str.title()
-                       .str.replace(' Dos ', ' dos ')
-                       .str.replace(' De ', ' de ')
-                       .str.replace(' Da ', ' da '))
+    df['municipio'] = (df['municipio'].str.title().str.replace(' Dos ', ' dos ').str.replace(' De ', ' de ').str.replace(' Da ', ' da '))
     return df
 
 
